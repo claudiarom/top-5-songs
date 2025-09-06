@@ -2,32 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>My Top 5 Spotify Artists</title>
+  <title>My Top 5 Songs</title>
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     h1 { color: #1DB954; }
     ul { list-style: none; padding: 0; }
     li { margin: 10px 0; font-size: 18px; }
-    img { width: 50px; height: 50px; border-radius: 50%; margin-right: 10px; vertical-align: middle; }
+    img { width: 60px; height: 60px; border-radius: 8px; vertical-align: middle; margin-right: 10px; }
   </style>
 </head>
 <body>
-  <h1>🎧 My Top 5 Artists</h1>
+  <h1>🎶 My Top 5 Songs of the Year</h1>
   <button id="loginBtn">Login with Spotify</button>
-  <ul id="artistList"></ul>
+  <ul id="trackList"></ul>
 
   <script>
-    const clientId = "2107203e01ef49e083536e0edac0abf4"
-    const redirectUri = window.location.origin + window.location.pathname;
+    const clientId = "2107203e01ef49e083536e0edac0abf4";
+    const redirectUri = window.location.origin + window.location.pathname; // same page
     const scopes = "user-top-read";
 
-    // Step 1: Redirect user to Spotify login
+    // Step 1: Login
     document.getElementById("loginBtn").onclick = function() {
       const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scopes)}`;
       window.location.href = authUrl;
     };
 
-    // Step 2: Get access token from URL
+    // Step 2: Grab token from URL
     function getAccessToken() {
       if (window.location.hash) {
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
@@ -38,16 +38,16 @@
 
     const token = getAccessToken();
     if (token) {
-      fetch("https://api.spotify.com/v1/me/top/artists?limit=5", {
+      fetch("https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=5", {
         headers: { Authorization: "Bearer " + token }
       })
       .then(res => res.json())
       .then(data => {
-        const list = document.getElementById("artistList");
+        const list = document.getElementById("trackList");
         list.innerHTML = "";
-        data.items.forEach(artist => {
+        data.items.forEach(track => {
           const li = document.createElement("li");
-          li.innerHTML = `<img src="${artist.images[0]?.url}" alt=""> ${artist.name}`;
+          li.innerHTML = `<img src="${track.album.images[0]?.url}" alt=""> ${track.name} by ${track.artists.map(a => a.name).join(", ")}`;
           list.appendChild(li);
         });
       })
